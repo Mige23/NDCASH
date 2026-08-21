@@ -562,6 +562,16 @@ body {
 .mes-resumen-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 .mes-resumen-val   { font-family: var(--mono); font-size: 26px; font-weight: 700; color: var(--green); letter-spacing: -1px; line-height: 1; }
 .mes-resumen-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.mes-productos-box {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px 14px; margin-bottom: 14px;
+}
+.mes-productos-header { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+.mes-productos-total  { font-size: 11px; color: var(--muted); }
+.mes-productos-lista  { display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; }
+.mes-producto-row     { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--surface2); border-radius: 8px; padding: 8px 10px; }
+.mes-producto-nombre  { min-width: 0; font-size: 12px; color: var(--text); overflow-wrap: anywhere; }
+.mes-producto-cantidad{ flex: none; font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--green); }
 .mes-dia-lista     { max-height: 55vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
 .mes-dia-item      {
   background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
@@ -1251,6 +1261,15 @@ body {
         <div style="text-align:right">
           <div class="mes-resumen-label">Promedio por día</div>
           <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--muted)" id="mesPromedioDia">$ 0.00</div>
+        </div>
+      </div>
+      <div class="mes-productos-box">
+        <div class="mes-productos-header">
+          <div class="mes-resumen-label">Productos vendidos</div>
+          <div class="mes-productos-total" id="mesProductosTotal">0 unidades</div>
+        </div>
+        <div class="mes-productos-lista" id="mesProductosLista">
+          <div class="mes-vacio" style="padding:10px 0">Sin productos vendidos</div>
         </div>
       </div>
       <div class="mes-dia-lista" id="mesDiaLista">
@@ -1969,6 +1988,22 @@ function renderVentasMes() {
   document.getElementById('mesTotalValor').textContent = formatPeso(totalMes);
   document.getElementById('mesResumenSub').textContent = `${totalCobros} cobro${totalCobros!==1?'s':''} · ${totalDias} día${totalDias!==1?'s':''}`;
   document.getElementById('mesPromedioDia').textContent = formatPeso(promedio);
+  const productosVendidos = new Map();
+  delMes.forEach(txn => (txn.items || []).forEach(item => {
+    const nombre = String(item.producto || '').trim();
+    const cantidad = Number(item.cantidad) || 0;
+    if (!nombre || cantidad <= 0) return;
+    const clave = nombre.toLocaleLowerCase('es');
+    const acumulado = productosVendidos.get(clave) || { nombre, cantidad: 0 };
+    acumulado.cantidad += cantidad;
+    productosVendidos.set(clave, acumulado);
+  }));
+  const productosOrdenados = [...productosVendidos.values()].sort((a,b) => b.cantidad - a.cantidad || a.nombre.localeCompare(b.nombre, 'es'));
+  const unidadesMes = productosOrdenados.reduce((s,p) => s + p.cantidad, 0);
+  document.getElementById('mesProductosTotal').textContent = `${+unidadesMes.toFixed(2)} unidad${unidadesMes!==1?'es':''}`;
+  document.getElementById('mesProductosLista').innerHTML = productosOrdenados.length
+    ? productosOrdenados.map(p => `<div class="mes-producto-row"><span class="mes-producto-nombre">${esc(p.nombre)}</span><span class="mes-producto-cantidad">${+p.cantidad.toFixed(2)}</span></div>`).join('')
+    : '<div class="mes-vacio" style="padding:10px 0">Sin productos vendidos</div>';
   const lista = document.getElementById('mesDiaLista');
   lista.innerHTML = '';
   if (!diasOrdenados.length) { lista.innerHTML = '<div class="mes-vacio">Sin ventas registradas para este mes</div>'; return; }
@@ -2542,3 +2577,4 @@ window.onload = function() {};
 </script>
 </body>
 </html>
+
