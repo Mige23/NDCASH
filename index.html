@@ -199,6 +199,17 @@ body {
 .cobrar-subtotal-num  { font-family: var(--mono); font-size: 36px; font-weight: 700; color: white; letter-spacing: -1.5px; line-height: 1; }
 .cobrar-subtotal-etiq { font-size: 10px; color: white; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
 .cobrar-vacio { text-align: center; color: white; font-size: 13px; padding: 10px 0 6px; display: none; }
+.envio-cobro-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; padding: 10px 12px; background: rgba(249,115,22,.08); border: 1px solid rgba(249,115,22,.2); border-radius: 12px; }
+.envio-cobro-label { font-size: 12px; font-weight: 700; color: var(--text); }
+.envio-cobro-label small { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; font-weight: 500; }
+.envio-precio-wrap { display: flex; align-items: center; gap: 5px; background: var(--bg); border: 1px solid var(--border); border-radius: 9px; padding: 7px 9px; color: var(--green); font-family: var(--mono); font-weight: 700; }
+.envio-precio-wrap:focus-within { border-color: var(--green); }
+.envio-precio-wrap input { width: 92px; border: none; outline: none; background: transparent; color: white; font-family: var(--mono); font-size: 15px; text-align: right; }
+.envios-dia-section { padding: 0 14px 8px; }
+.envios-dia-card { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 11px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 13px; }
+.envios-dia-title { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 1px; }
+.envios-dia-valores { text-align: right; font-size: 11px; color: var(--muted); }
+.envios-dia-valores strong { color: var(--green); font-family: var(--mono); font-size: 13px; }
 
 .lista-section { padding: 0 14px 8px; }
 .lista-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
@@ -572,6 +583,9 @@ body {
 .mes-producto-row     { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--surface2); border-radius: 8px; padding: 8px 10px; }
 .mes-producto-nombre  { min-width: 0; font-size: 12px; color: var(--text); overflow-wrap: anywhere; }
 .mes-producto-cantidad{ flex: none; font-family: var(--mono); font-size: 13px; font-weight: 700; color: var(--green); }
+.mes-envios-box { display: flex; justify-content: space-between; align-items: center; gap: 12px; background: rgba(249,115,22,.08); border: 1px solid rgba(249,115,22,.22); border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; }
+.mes-envios-cantidad { font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--text); }
+.mes-envios-total { text-align: right; font-family: var(--mono); font-size: 18px; font-weight: 700; color: var(--green); }
 .mes-dia-lista     { max-height: 55vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
 .mes-dia-item      {
   background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
@@ -766,7 +780,7 @@ body {
         <span class="header-badge">Offline</span>
       </div>
       <div class="subtotal-grande" id="subtotalGrande">$ 0.00</div>
-      <div class="subtotal-label">Subtotal — venta actual</div>
+      <div class="subtotal-label" id="subtotalDetalle">Subtotal — venta actual</div>
       <div class="total-dia-row">
         <div>
           <div class="total-dia-etiq">Total del día</div>
@@ -791,6 +805,13 @@ body {
       <div class="stat-card">
         <div class="valor blanco" id="statUnidades">0</div>
         <div class="etiq">Unidades vendidas</div>
+      </div>
+    </div>
+
+    <div class="envios-dia-section">
+      <div class="envios-dia-card">
+        <div class="envios-dia-title">🚚 Envíos de hoy</div>
+        <div class="envios-dia-valores"><strong id="statEnviosCantidad">0</strong> envíos · <strong id="statEnviosTotal">$ 0.00</strong></div>
       </div>
     </div>
 
@@ -860,6 +881,10 @@ body {
           <span class="cobrar-items-count" id="cobrarItemsCount">0 items · $ 0.00</span>
         </div>
         <div id="cobrarConItems">
+          <div class="envio-cobro-row">
+            <div class="envio-cobro-label">🚚 Envío<small>Opcional</small></div>
+            <label class="envio-precio-wrap">$ <input type="number" id="precioEnvio" min="0" step="0.01" inputmode="decimal" placeholder="0.00" oninput="actualizarPrecioEnvio()"></label>
+          </div>
           <div class="cobrar-subtotal-display">
             <div>
               <div class="cobrar-subtotal-etiq">A cobrar</div>
@@ -1263,6 +1288,16 @@ body {
           <div style="font-family:var(--mono);font-size:16px;font-weight:700;color:var(--muted)" id="mesPromedioDia">$ 0.00</div>
         </div>
       </div>
+      <div class="mes-envios-box">
+        <div>
+          <div class="mes-resumen-label">Envíos realizados</div>
+          <div class="mes-envios-cantidad" id="mesEnviosCantidad">0 envíos</div>
+        </div>
+        <div>
+          <div class="mes-resumen-label" style="text-align:right">Total en envíos</div>
+          <div class="mes-envios-total" id="mesEnviosTotal">$ 0.00</div>
+        </div>
+      </div>
       <div class="mes-productos-box">
         <div class="mes-productos-header">
           <div class="mes-resumen-label">Productos vendidos</div>
@@ -1445,6 +1480,7 @@ let itemsActuales = JSON.parse(sessionStorage.getItem('items_actuales')) || [];
 let transacciones = JSON.parse(localStorage.getItem('txn_pro'))         || [];
 let gastosLista   = JSON.parse(localStorage.getItem('gastos_lista_pro'))|| [];
 let inventario    = JSON.parse(localStorage.getItem('inventario_pro'))  || [];
+let precioEnvioActual = Math.max(0, parseFloat(sessionStorage.getItem('precio_envio_actual')) || 0);
 let totalDiaVisible = false, netoVisible = false;
 
 let deferredPrompt;
@@ -1471,11 +1507,15 @@ function convertirCantidad(v) {
   return parseFloat(v);
 }
 function formatPeso(num) { return '$ ' + (+num).toFixed(2); }
+function subtotalProductosActual() { return itemsActuales.reduce((s,v) => s+v.total, 0); }
+function totalVentaActual() { return +(subtotalProductosActual() + precioEnvioActual).toFixed(2); }
 function guardarEstado() {
   localStorage.setItem('gastos_lista_pro', JSON.stringify(gastosLista));
   localStorage.setItem('txn_pro',          JSON.stringify(transacciones));
   localStorage.setItem('inventario_pro',   JSON.stringify(inventario));
   sessionStorage.setItem('items_actuales', JSON.stringify(itemsActuales));
+  if (precioEnvioActual > 0) sessionStorage.setItem('precio_envio_actual', String(precioEnvioActual));
+  else sessionStorage.removeItem('precio_envio_actual');
 }
 function esc(str) {
   return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
@@ -1515,7 +1555,8 @@ function toggleNeto() {
 
 function actualizar() { renderLista(); actualizarSubtotal(); actualizarStats(); actualizarTotalDia(); actualizarSugerencias(); }
 function actualizarSubtotal() {
-  const subtotal = itemsActuales.reduce((s,v) => s+v.total, 0);
+  const subtotalProductos = subtotalProductosActual();
+  const subtotal = totalVentaActual();
   const count = itemsActuales.length, hayItems = count > 0;
   const elGrande = document.getElementById('subtotalGrande');
   elGrande.textContent = formatPeso(subtotal);
@@ -1526,14 +1567,29 @@ function actualizarSubtotal() {
   document.getElementById('cobrarConItems').style.display = hayItems ? 'block' : 'none';
   document.getElementById('cobrarVacio').style.display    = hayItems ? 'none'  : 'block';
   document.getElementById('btnCobrar').style.opacity      = hayItems ? '1' : '0.5';
+  const envioInput = document.getElementById('precioEnvio');
+  if (envioInput && document.activeElement !== envioInput) envioInput.value = precioEnvioActual > 0 ? precioEnvioActual : '';
+  document.getElementById('subtotalDetalle').textContent = precioEnvioActual > 0
+    ? `Productos ${formatPeso(subtotalProductos)} + envío ${formatPeso(precioEnvioActual)}`
+    : 'Subtotal — venta actual';
+}
+function actualizarPrecioEnvio() {
+  const valor = parseFloat(document.getElementById('precioEnvio').value);
+  precioEnvioActual = Number.isFinite(valor) && valor > 0 ? +valor.toFixed(2) : 0;
+  guardarEstado();
+  actualizarSubtotal();
 }
 function actualizarStats() {
   const totalDia = transacciones.reduce((s,t) => s+t.total, 0);
   const totalUnid = transacciones.reduce((s,t) => s+(t.items||[]).reduce((a,i) => a+i.cantidad,0), 0);
   const gastos = gastosLista.reduce((s,g) => s+g.monto, 0);
+  const enviosDia = transacciones.filter(t => (+t.envio || 0) > 0);
+  const totalEnviosDia = enviosDia.reduce((s,t) => s+(+t.envio || 0), 0);
   const neto = +(totalDia - gastos).toFixed(2);
   document.getElementById('statTransacciones').textContent = transacciones.length;
   document.getElementById('statUnidades').textContent = +totalUnid.toFixed(3);
+  document.getElementById('statEnviosCantidad').textContent = enviosDia.length;
+  document.getElementById('statEnviosTotal').textContent = formatPeso(totalEnviosDia);
   if (netoVisible) {
     document.getElementById('statNeto').textContent = formatPeso(neto);
     document.getElementById('statNeto').style.color = neto>=0 ? 'var(--green)' : 'var(--red)';
@@ -1612,7 +1668,9 @@ function agregarItem() {
 }
 function eliminarItem(i) {
   const nombre = itemsActuales[i].producto;
-  itemsActuales.splice(i, 1); guardarEstado(); actualizar();
+  itemsActuales.splice(i, 1);
+  if (!itemsActuales.length) precioEnvioActual = 0;
+  guardarEstado(); actualizar();
   mostrarToast(`🗑 ${nombre} quitado`,'warn');
 }
 function limpiarForm() {
@@ -1622,14 +1680,14 @@ function limpiarForm() {
   document.getElementById('producto').focus();
 }
 function resetearVentaActual() {
-  if (!itemsActuales.length) { mostrarToast('ℹ️ La venta ya está vacía'); return; }
-  if (confirm('¿Limpiar la venta en curso?')) { itemsActuales = []; guardarEstado(); actualizar(); mostrarToast('🗑 Venta limpiada'); }
+  if (!itemsActuales.length && precioEnvioActual <= 0) { mostrarToast('ℹ️ La venta ya está vacía'); return; }
+  if (confirm('¿Limpiar la venta en curso?')) { itemsActuales = []; precioEnvioActual = 0; guardarEstado(); actualizar(); mostrarToast('🗑 Venta limpiada'); }
 }
 
 let metodoPagoSeleccionado = null;
 function abrirModalCobro() {
   if (!itemsActuales.length) { mostrarToast('⚠️ Agregá productos primero','warn'); return; }
-  const subtotal = itemsActuales.reduce((s,v) => s+v.total, 0);
+  const subtotal = totalVentaActual();
   document.getElementById('modalSubtotalValor').textContent = formatPeso(subtotal);
   metodoPagoSeleccionado = null;
   document.getElementById('modalCobro').classList.add('visible');
@@ -1643,7 +1701,7 @@ function volverAMetodos() {
 }
 function seleccionarMetodo(metodo) {
   metodoPagoSeleccionado = metodo;
-  const subtotal = itemsActuales.reduce((s,v) => s+v.total, 0);
+  const subtotal = totalVentaActual();
   document.getElementById('modalCobro').classList.remove('visible');
   if (metodo === 'efectivo') {
     document.getElementById('modalEfectivoSubtotal').textContent = formatPeso(subtotal);
@@ -1664,7 +1722,7 @@ function seleccionarMetodo(metodo) {
   }
 }
 function abrirCobroMultiple() {
-  const subtotal = itemsActuales.reduce((s,v) => s+v.total, 0);
+  const subtotal = totalVentaActual();
   document.getElementById('modalCobro').classList.remove('visible');
   document.getElementById('modalCobroMultipleSubtotal').textContent = formatPeso(subtotal);
   const lista = document.getElementById('listaCobroMultiple');
@@ -1705,7 +1763,7 @@ function agregarFilaCobroMultiple(isFirst = false) {
   document.getElementById('listaCobroMultiple').appendChild(row);
 }
 function actualizarResumenCobroMultiple() {
-  const subtotal = itemsActuales.reduce((s,v) => s+v.total, 0);
+  const subtotal = totalVentaActual();
   const rows = [...document.querySelectorAll('#listaCobroMultiple .cobro-multiple-row')];
   let totalIngresado = 0;
   rows.forEach(row => {
@@ -1731,7 +1789,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function calcularVueltoModal() {
-  const subtotal = itemsActuales.reduce((s,v) => s+v.total, 0);
+  const subtotal = totalVentaActual();
   const pagaCon  = parseFloat(document.getElementById('modalPagaCon').value);
   const res=document.getElementById('modalVuelto'), num=document.getElementById('modalVueltoNum');
   const lbl=document.getElementById('modalVueltoLabel'), btnConf=document.getElementById('btnConfirmarCobro');
@@ -1751,7 +1809,7 @@ function calcularVueltoModal() {
   }
 }
 function confirmarCobro() {
-  const subtotal = itemsActuales.reduce((s,v) => s+v.total, 0);
+  const subtotal = totalVentaActual();
   const pagaCon  = parseFloat(document.getElementById('modalPagaCon').value);
   if (isNaN(pagaCon) || pagaCon <= 0) { mostrarToast('⚠️ Ingresá el monto recibido','warn'); return; }
   const diferencia = +(pagaCon - subtotal).toFixed(2);
@@ -1766,7 +1824,7 @@ function confirmarCobro() {
   }
 }
 function confirmarCobroMultiple() {
-  const subtotal = itemsActuales.reduce((s,v) => s+v.total, 0);
+  const subtotal = totalVentaActual();
   const rows = [...document.querySelectorAll('#listaCobroMultiple .cobro-multiple-row')];
   const pagos = [];
   let totalIngresado = 0;
@@ -1791,7 +1849,7 @@ function confirmarCobroMultiple() {
 function confirmarFiado() {
   const nombre = document.getElementById('modalFiadoNombre').value.trim();
   if (!nombre) { mostrarToast('⚠️ Ingresá el nombre del cliente','warn'); return; }
-  const subtotal = itemsActuales.reduce((s,v) => s+v.total, 0);
+  const subtotal = totalVentaActual();
   registrarCobro(subtotal, null, null, 'fiado', nombre);
   cerrarModalCobro();
   mostrarToast(`📝 Fiado registrado para ${nombre} — ${formatPeso(subtotal)}`,'warn');
@@ -1861,16 +1919,19 @@ function registrarCobro(subtotal, pagaCon, vuelto, metodo, clienteFiado, extra =
   verificarAlertas();
   const pendiente = Number.isFinite(extra.pendiente) ? +extra.pendiente.toFixed(2) : 0;
   const pagos = Array.isArray(extra.pagos) ? extra.pagos.map(p => ({ metodo: p.metodo, monto: +p.monto.toFixed(2) })) : [];
+  const envio = +precioEnvioActual.toFixed(2);
   const txn = {
     id: Date.now(),
     hora: new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit'}),
     fecha: new Date().toLocaleDateString('es-AR'),
-    total: subtotal, pagaCon, vuelto, metodoPago: metodo,
+    total: subtotal, envio, pagaCon, vuelto, metodoPago: metodo,
     pendiente, pagos, pagoParcial: pendiente > 0,
     clienteFiado: clienteFiado || null, items: [...itemsActuales]
   };
   transacciones.push(txn);
-  itemsActuales = []; sessionStorage.removeItem('items_actuales');
+  itemsActuales = []; precioEnvioActual = 0;
+  sessionStorage.removeItem('items_actuales');
+  sessionStorage.removeItem('precio_envio_actual');
   guardarEstado(); actualizar();
   document.getElementById('headerEl').classList.add('cobro-flash');
   setTimeout(() => document.getElementById('headerEl').classList.remove('cobro-flash'), 600);
@@ -1930,6 +1991,7 @@ function abrirHistorial() {
           </div>
           ${txn.clienteFiado ? `<div style="font-size:12px;color:var(--yellow);margin-bottom:3px">👤 Cliente: <b>${esc(txn.clienteFiado)}</b></div>` : ''}
           ${txn.pagoParcial ? `<div style="font-size:11px;color:var(--yellow);margin-bottom:3px">⏳ Pago parcial: faltan ${formatPeso(txn.pendiente || 0)}</div>` : ''}
+          ${(+txn.envio || 0) > 0 ? `<div style="font-size:12px;color:var(--green);margin-bottom:3px">🚚 Envío: <b>${formatPeso(txn.envio)}</b></div>` : ''}
           <div class="historial-txn-productos">${str}</div>
           ${txn.vuelto!==null&&txn.vuelto!==undefined?`<div style="font-size:11px;color:var(--muted);margin-top:3px">Vuelto: ${formatPeso(txn.vuelto)}</div>`:''}`;
       }
@@ -1988,6 +2050,10 @@ function renderVentasMes() {
   document.getElementById('mesTotalValor').textContent = formatPeso(totalMes);
   document.getElementById('mesResumenSub').textContent = `${totalCobros} cobro${totalCobros!==1?'s':''} · ${totalDias} día${totalDias!==1?'s':''}`;
   document.getElementById('mesPromedioDia').textContent = formatPeso(promedio);
+  const enviosMes = delMes.filter(txn => (+txn.envio || 0) > 0);
+  const totalEnviosMes = enviosMes.reduce((s,txn) => s+(+txn.envio || 0), 0);
+  document.getElementById('mesEnviosCantidad').textContent = `${enviosMes.length} envío${enviosMes.length!==1?'s':''}`;
+  document.getElementById('mesEnviosTotal').textContent = formatPeso(totalEnviosMes);
   const productosVendidos = new Map();
   delMes.forEach(txn => (txn.items || []).forEach(item => {
     const nombre = String(item.producto || '').trim();
@@ -2012,19 +2078,26 @@ function renderVentasMes() {
     const cobros = porDia[dia];
     const totalDia = cobros.reduce((s,t) => s+t.total, 0);
     const unidades = cobros.reduce((s,t) => s+(t.items||[]).reduce((a,i) => a+i.cantidad,0), 0);
+    const enviosDia = cobros.filter(txn => (+txn.envio || 0) > 0);
+    const totalEnviosDia = enviosDia.reduce((s,txn) => s+(+txn.envio || 0), 0);
     const item = document.createElement('div'); item.className = 'mes-dia-item';
-    const cobroRows = cobros.map(txn => `
-      <div class="mes-cobro-row">
+    const cobroRows = cobros.map(txn => {
+      const esNota = txn.tipo==='nota_credito'||txn.tipo==='nota_debito';
+      const productos = esNota ? esc(txn.descripcion||'') : (txn.items||[]).slice(0,2).map(i=>esc(i.producto)).join(', ')+((txn.items||[]).length>2?` +${txn.items.length-2} más`:'');
+      const envio = (+txn.envio || 0) > 0 ? ` · 🚚 ${formatPeso(txn.envio)}` : '';
+      return `<div class="mes-cobro-row">
         <span class="mes-cobro-hora">${txn.hora||''}</span>
-        <span style="flex:1;margin:0 8px;font-size:11px;color:var(--muted)">${txn.tipo==='nota_credito'||txn.tipo==='nota_debito' ? esc(txn.descripcion||'') : (txn.items||[]).slice(0,2).map(i=>esc(i.producto)).join(', ')+((txn.items||[]).length>2?` +${txn.items.length-2} más`:'')}</span>
+        <span style="flex:1;margin:0 8px;font-size:11px;color:var(--muted)">${productos}${envio}</span>
         <span class="mes-cobro-metodo">${metodoIcons[txn.metodoPago]||'💰'} ${txn.metodoPago||'cobro'}</span>
         <span class="mes-cobro-monto" style="margin-left:8px">${formatPeso(txn.total)}</span>
-      </div>`).join('');
+      </div>`;
+    }).join('');
     item.innerHTML = `
       <div class="mes-dia-header"><span class="mes-dia-fecha">📆 ${dia}</span><span class="mes-dia-total">${formatPeso(totalDia)}</span></div>
       <div class="mes-dia-stats">
         <div class="mes-dia-stat">${cobros.length} <span>cobro${cobros.length!==1?'s':''}</span></div>
         <div class="mes-dia-stat">${+unidades.toFixed(2)} <span>unidades</span></div>
+        ${enviosDia.length ? `<div class="mes-dia-stat">${enviosDia.length} <span>envío${enviosDia.length!==1?'s':''} · ${formatPeso(totalEnviosDia)}</span></div>` : ''}
       </div>
       <div class="mes-cobros-lista" id="cobros_${dia.replace(/\//g,'_')}">${cobroRows}</div>`;
     item.addEventListener('click', () => item.querySelector('.mes-cobros-lista').classList.toggle('abierto'));
@@ -2036,11 +2109,13 @@ function cierreDeCaja() {
   if (!transacciones.length) { mostrarToast('ℹ️ No hay ventas para cerrar hoy','warn'); return; }
   const ahora = new Date(), totalDia = transacciones.reduce((s,t) => s+t.total, 0);
   const gastos = gastosLista.reduce((s,g) => s+g.monto, 0), neto = +(totalDia-gastos).toFixed(2);
-  if (!confirm(`¿Cerrar la caja?\n\nTotal: ${formatPeso(totalDia)}\nGastos: ${formatPeso(gastos)}\nNeto: ${formatPeso(neto)}\nTransacciones: ${transacciones.length}\n\nSe descargará el resumen.`)) return;
+  const enviosDia = transacciones.filter(t => (+t.envio || 0) > 0);
+  const totalEnviosDia = enviosDia.reduce((s,t) => s+(+t.envio || 0), 0);
+  if (!confirm(`¿Cerrar la caja?\n\nTotal: ${formatPeso(totalDia)}\nGastos: ${formatPeso(gastos)}\nNeto: ${formatPeso(neto)}\nTransacciones: ${transacciones.length}\nEnvíos: ${enviosDia.length} · ${formatPeso(totalEnviosDia)}\n\nSe descargará el resumen.`)) return;
   let L = ['========================================','       CIERRE DE CAJA — VentasPRO','========================================',
     `Fecha:          ${ahora.toLocaleDateString('es-AR')}`,`Hora cierre:    ${ahora.toLocaleTimeString('es-AR')}`,
     `Total vendido:  ${formatPeso(totalDia)}`,`Gastos:         ${formatPeso(gastos)}`,`Neto:           ${formatPeso(neto)}`,
-    `Transacciones:  ${transacciones.length}`,''];
+    `Transacciones:  ${transacciones.length}`,`Envíos:         ${enviosDia.length} · ${formatPeso(totalEnviosDia)}`,''];
   if (gastosLista.length) { L.push('--- GASTOS ---'); gastosLista.forEach(g => L.push(`  · ${g.desc}: ${formatPeso(g.monto)}`)); L.push(''); }
   L.push('--- COBROS ---','');
   transacciones.forEach((txn,i) => {
@@ -2052,6 +2127,7 @@ function cierreDeCaja() {
     } else {
       L.push(`Cobro #${i+1}  [${txn.hora}]  ${txn.metodoPago?txn.metodoPago.toUpperCase():'COBRO'}${txn.clienteFiado?' — Cliente: '+txn.clienteFiado:''}`);
       (txn.items||[]).forEach(it => L.push(`  · ${it.producto}  ${it.cantidad} × $${it.precio} = $${it.total}`));
+      if ((+txn.envio || 0) > 0) L.push(`  · ENVÍO: ${formatPeso(txn.envio)}`);
       L.push(`  TOTAL: ${formatPeso(txn.total)}`);
       if (txn.pagaCon!==null&&txn.pagaCon!==undefined) L.push(`  Pagó con: ${formatPeso(txn.pagaCon)}  Vuelto: ${formatPeso(txn.vuelto)}`);
     }
@@ -2064,8 +2140,9 @@ function cierreDeCaja() {
   transacciones.forEach(t => txnHistorial.push(t));
   const seisMesesAtras = Date.now() - (6 * 30 * 24 * 60 * 60 * 1000);
   localStorage.setItem('txn_historial_pro', JSON.stringify(txnHistorial.filter(t => t.id > seisMesesAtras)));
-  transacciones=[]; itemsActuales=[]; gastosLista=[];
+  transacciones=[]; itemsActuales=[]; gastosLista=[]; precioEnvioActual=0;
   sessionStorage.removeItem('items_actuales');
+  sessionStorage.removeItem('precio_envio_actual');
   guardarEstado(); renderGastos(); actualizar();
   mostrarToast('🔒 Cierre de caja realizado');
 }
@@ -2214,12 +2291,14 @@ function exportarInventarioExcel() {
 function exportarVentasPDF() {
   if (!transacciones.length) { mostrarToast('Sin ventas para exportar','warn'); return; }
   const ahora = new Date(), total = transacciones.reduce((s,t) => s+t.total, 0), gastos = gastosLista.reduce((s,g) => s+g.monto, 0);
+  const envios = transacciones.filter(t => (+t.envio || 0) > 0), totalEnvios = envios.reduce((s,t) => s+(+t.envio || 0), 0);
   let L = ['========================================','     REPORTE DE VENTAS — VentasPRO','========================================',
     `Generado: ${ahora.toLocaleString('es-AR')}`,`Total cobrado: ${formatPeso(total)}`,`Gastos: ${formatPeso(gastos)}`,
-    `Neto: ${formatPeso(total-gastos)}`,`Transacciones: ${transacciones.length}`,''];
+    `Neto: ${formatPeso(total-gastos)}`,`Transacciones: ${transacciones.length}`,`Envíos: ${envios.length} · ${formatPeso(totalEnvios)}`,''];
   transacciones.forEach((txn,i) => {
     L.push(`#${i+1} [${txn.hora}]  ${formatPeso(txn.total)}`);
-    txn.items.forEach(it => L.push(`   ${it.producto} × ${it.cantidad} = $${it.total}`));
+    (txn.items||[]).forEach(it => L.push(`   ${it.producto} × ${it.cantidad} = $${it.total}`));
+    if ((+txn.envio || 0) > 0) L.push(`   ENVÍO = ${formatPeso(txn.envio)}`);
   });
   L.push('========================================');
   descargar(`ventas_${ahora.toLocaleDateString('es-AR').replace(/\//g,'-')}.txt`, L.join('\n'));
